@@ -2,21 +2,22 @@ package main
 
 import (
 	"gitee.com/kogic/xim"
-	. "gitee.com/kogic/xim/component"
-	. "gitee.com/kogic/xim/style"
+	. "gitee.com/kogic/xim/components/root"
+	. "gitee.com/kogic/xim/components/text"
+	. "gitee.com/kogic/xim/components/view"
+	. "gitee.com/kogic/xim/types"
 )
 
-type Cs []Component
-
 func main() {
-	xim.Render(View{
+	xim.SetTitle("Hello Xim")
+	xim.Render(&View{
 		Components: Cs{
 			&Text{
-				Text: "Hello World",
-				Style: Style{
-					FontSize: "20px",
+				Content: "Hello Xim",
+				Style: &TextStyle{
+					FontSize: "40px",
 				},
 			},
 		},
-	})
+	}, Root{})
 }
