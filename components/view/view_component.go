@@ -9,28 +9,37 @@ import (
 // 仅作为承载Components的容器
 type View struct {
 	id         string
+	Name       string
 	Components []Component
 }
 
-func (v *View) GetID() string {
-	if v.id == "" {
-		v.id = utils.GenerateID()
-	}
-	return v.id
+func (c *View) GetName() string {
+	return c.Name
 }
 
-func (v *View) GetElementType() string {
-	return "div"
-}
-
-func (v *View) GetInnerHTML() string {
-	return ""
-}
-
-func (v *View) GetStyle() Style {
+func (c *View) GetCallbackMap() CallbackMap {
 	return nil
 }
 
-func (v *View) GetChildComponents() []Component {
-	return v.Components
+func (c *View) GetID() string {
+	if c.id == "" {
+		c.id = utils.GenerateID()
+	}
+	return c.id
+}
+
+func (c *View) GetElementType() string {
+	return "div"
+}
+
+func (c *View) GetInnerHTML() string {
+	return ""
+}
+
+func (c *View) GetStyle() Style {
+	return nil
+}
+
+func (c *View) GetChildComponents() []Component {
+	return c.Components
 }

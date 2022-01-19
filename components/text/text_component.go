@@ -8,8 +8,17 @@ import (
 // Text 文本
 type Text struct {
 	id      string
+	Name    string
 	Style   *TextStyle
 	Content string
+}
+
+func (c *Text) GetName() string {
+	return c.Name
+}
+
+func (c *Text) GetCallbackMap() types.CallbackMap {
+	return nil
 }
 
 func (c *Text) GetID() string {

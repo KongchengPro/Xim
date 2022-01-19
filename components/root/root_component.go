@@ -8,6 +8,14 @@ import (
 type Root struct {
 }
 
+func (c Root) GetName() string {
+	return ""
+}
+
+func (r Root) GetCallbackMap() types.CallbackMap {
+	return nil
+}
+
 func (r Root) GetID() string {
 	return constants.RootComponentID
 }
