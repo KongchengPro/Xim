@@ -1,0 +1,13 @@
+// 最基础的标记
+//xim:handler
+// 带有Tab前缀的标记
+	//xim:handler
+// 带有空格前缀的标记
+    //xim:handler
+// 带有后缀文字的标记
+//xim:handler Description
+// 在字符串中
+"//xim:handler"
+// 中间有空格
+//xim: handler
+// xim:handler
