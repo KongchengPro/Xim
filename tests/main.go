@@ -8,11 +8,9 @@ import (
 	. "gitee.com/kogic/xim/components/text"
 	. "gitee.com/kogic/xim/components/view"
 	. "gitee.com/kogic/xim/types"
-	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	logrus.SetLevel(logrus.DebugLevel)
 	xim.SetTitle("Hello Xim")
 	xim.Init(&View{
 		Components: Cs{
