@@ -3,7 +3,8 @@ package xim
 import (
 	"gitee.com/kogic/xim/api/dom"
 	"gitee.com/kogic/xim/internal/constants"
-	. "gitee.com/kogic/xim/types"
+	. "gitee.com/kogic/xim/types/component"
+	. "gitee.com/kogic/xim/types/style"
 	"github.com/sirupsen/logrus"
 	"syscall/js"
 )
@@ -32,18 +33,17 @@ func Init(c Component, parent Component) {
 	element.Set("id", c.GetID())
 	callbackMap := c.GetCallbackMap()
 	if callbackMap != nil {
-		for key, value := range callbackMap {
-			element.Call("addEventListener", key, js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-				// TODO 传参
-				value()
+		for callbackName, callbackFunc := range callbackMap {
+			element.Call("addEventListener", callbackName, js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				callbackFunc(this, args...)
 				return nil
 			}))
 		}
 	}
 	// 在父元素中添加
 	parentElement.Call("appendChild", element)
-	// 渲染组件
-	Render(c)
+	// 刷新一次组件以显示内容
+	Refresh(c)
 	// 在组件映射中添加
 	dom.ComponentMap[parent.GetName()+c.GetName()] = c
 	// 递归渲染子组件
@@ -54,21 +54,21 @@ func Init(c Component, parent Component) {
 	}
 }
 
-// Render 渲染组件
-func Render(c Component) {
-	element := doc.Call("getElementById", c.GetID())
-	// 获取组件相关信息
-	innerHTML := c.GetInnerHTML()
-	style := c.GetStyle()
-	if innerHTML != "" {
-		element.Set("innerHTML", innerHTML)
-	}
-	if style != nil {
-		element.Call("setAttribute", "style", GenerateCSS(style))
+// Refresh 刷新组件显示的内容（不包括回调）
+func Refresh(components ...Component) {
+	for _, c := range components {
+		element := doc.Call("getElementById", c.GetID())
+		// 获取组件相关信息
+		innerHTML := c.GetInnerHTML()
+		style := c.GetStyle()
+		if innerHTML != "" {
+			element.Set("innerHTML", innerHTML)
+		}
+		if style != nil {
+			element.Call("setAttribute", "style", GenerateCSS(style))
+		}
 	}
 }
-
-var Refresh = Render
 
 func SetTitle(title string) {
 	doc.Set("title", title)

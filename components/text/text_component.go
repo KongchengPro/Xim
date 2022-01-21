@@ -2,7 +2,9 @@ package text
 
 import (
 	"gitee.com/kogic/xim/internal/utils"
-	"gitee.com/kogic/xim/types"
+	"gitee.com/kogic/xim/types/callback"
+	"gitee.com/kogic/xim/types/component"
+	"gitee.com/kogic/xim/types/style"
 )
 
 // Text 文本
@@ -17,7 +19,7 @@ func (c *Text) GetName() string {
 	return c.Name
 }
 
-func (c *Text) GetCallbackMap() types.CallbackMap {
+func (c *Text) GetCallbackMap() callback.Map {
 	return nil
 }
 
@@ -36,10 +38,10 @@ func (c *Text) GetInnerHTML() string {
 	return c.Content
 }
 
-func (c *Text) GetStyle() types.Style {
+func (c *Text) GetStyle() style.Style {
 	return c.Style
 }
 
-func (c *Text) GetChildComponents() []types.Component {
+func (c *Text) GetChildComponents() []component.Component {
 	return nil
 }

@@ -2,7 +2,9 @@ package button
 
 import (
 	"gitee.com/kogic/xim/internal/utils"
-	"gitee.com/kogic/xim/types"
+	"gitee.com/kogic/xim/types/callback"
+	"gitee.com/kogic/xim/types/component"
+	"gitee.com/kogic/xim/types/style"
 )
 
 // Button 按钮
@@ -10,15 +12,15 @@ type Button struct {
 	id      string
 	Name    string
 	Content string
-	OnClick func(args ...interface{})
+	OnClick callback.Func
 }
 
 func (c *Button) GetName() string {
 	return c.Name
 }
 
-func (c *Button) GetCallbackMap() types.CallbackMap {
-	callbackMap := make(types.CallbackMap)
+func (c *Button) GetCallbackMap() callback.Map {
+	callbackMap := make(callback.Map)
 	callbackMap["click"] = c.OnClick
 	return callbackMap
 }
@@ -38,10 +40,10 @@ func (c *Button) GetInnerHTML() string {
 	return c.Content
 }
 
-func (c *Button) GetStyle() types.Style {
+func (c *Button) GetStyle() style.Style {
 	return nil
 }
 
-func (c *Button) GetChildComponents() []types.Component {
+func (c *Button) GetChildComponents() []component.Component {
 	return nil
 }

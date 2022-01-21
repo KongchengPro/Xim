@@ -1,9 +1,11 @@
 package dom
 
-import "gitee.com/kogic/xim/types"
+import (
+	"gitee.com/kogic/xim/types/component"
+)
 
-var ComponentMap = make(map[string]types.Component)
+var ComponentMap = make(map[string]component.Component)
 
-func GetComponentByPath(path string) types.Component {
+func GetComponentByPath(path string) component.Component {
 	return ComponentMap[path]
 }

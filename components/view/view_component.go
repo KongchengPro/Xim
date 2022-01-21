@@ -2,7 +2,9 @@ package view
 
 import (
 	"gitee.com/kogic/xim/internal/utils"
-	. "gitee.com/kogic/xim/types"
+	"gitee.com/kogic/xim/types/callback"
+	. "gitee.com/kogic/xim/types/component"
+	. "gitee.com/kogic/xim/types/style"
 )
 
 // View 视图
@@ -17,7 +19,7 @@ func (c *View) GetName() string {
 	return c.Name
 }
 
-func (c *View) GetCallbackMap() CallbackMap {
+func (c *View) GetCallbackMap() callback.Map {
 	return nil
 }
 
