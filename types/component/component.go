@@ -1,8 +1,8 @@
 package component
 
 import (
-	"gitee.com/kogic/xim/types/callback"
-	"gitee.com/kogic/xim/types/style"
+	"github.com/kongchengpro/xim/types/callback"
+	"github.com/kongchengpro/xim/types/style"
 )
 
 type Cs []Component

@@ -2,14 +2,14 @@ package main
 
 import (
 	"fmt"
-	"gitee.com/kogic/xim"
-	"gitee.com/kogic/xim/api/dom"
-	. "gitee.com/kogic/xim/components/button"
-	. "gitee.com/kogic/xim/components/root"
-	. "gitee.com/kogic/xim/components/text"
-	. "gitee.com/kogic/xim/components/view"
-	"gitee.com/kogic/xim/types/callback"
-	. "gitee.com/kogic/xim/types/component"
+	"github.com/kongchengpro/xim"
+	"github.com/kongchengpro/xim/api/dom"
+	. "github.com/kongchengpro/xim/components/button"
+	. "github.com/kongchengpro/xim/components/root"
+	. "github.com/kongchengpro/xim/components/text"
+	. "github.com/kongchengpro/xim/components/view"
+	"github.com/kongchengpro/xim/types/callback"
+	. "github.com/kongchengpro/xim/types/component"
 )
 
 func main() {

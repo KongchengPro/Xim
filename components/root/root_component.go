@@ -1,10 +1,10 @@
 package root
 
 import (
-	"gitee.com/kogic/xim/internal/constants"
-	"gitee.com/kogic/xim/types/callback"
-	"gitee.com/kogic/xim/types/component"
-	"gitee.com/kogic/xim/types/style"
+	"github.com/kongchengpro/xim/internal/constants"
+	"github.com/kongchengpro/xim/types/callback"
+	"github.com/kongchengpro/xim/types/component"
+	"github.com/kongchengpro/xim/types/style"
 )
 
 type Root struct {

@@ -1,7 +1,7 @@
 package dom
 
 import (
-	"gitee.com/kogic/xim/types/component"
+	"github.com/kongchengpro/xim/types/component"
 )
 
 var ComponentMap = make(map[string]component.Component)

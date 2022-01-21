@@ -1,4 +1,4 @@
-module gitee.com/kogic/xim
+module github.com/kongchengpro/xim
 
 go 1.17
 

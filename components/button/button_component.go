@@ -1,10 +1,10 @@
 package button
 
 import (
-	"gitee.com/kogic/xim/internal/utils"
-	"gitee.com/kogic/xim/types/callback"
-	"gitee.com/kogic/xim/types/component"
-	"gitee.com/kogic/xim/types/style"
+	"github.com/kongchengpro/xim/internal/utils"
+	"github.com/kongchengpro/xim/types/callback"
+	"github.com/kongchengpro/xim/types/component"
+	"github.com/kongchengpro/xim/types/style"
 )
 
 // Button 按钮

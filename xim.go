@@ -1,10 +1,10 @@
 package xim
 
 import (
-	"gitee.com/kogic/xim/api/dom"
-	"gitee.com/kogic/xim/internal/constants"
-	. "gitee.com/kogic/xim/types/component"
-	. "gitee.com/kogic/xim/types/style"
+	"github.com/kongchengpro/xim/api/dom"
+	"github.com/kongchengpro/xim/internal/constants"
+	. "github.com/kongchengpro/xim/types/component"
+	. "github.com/kongchengpro/xim/types/style"
 	"github.com/sirupsen/logrus"
 	"syscall/js"
 )
