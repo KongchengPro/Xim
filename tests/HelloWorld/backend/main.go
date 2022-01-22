@@ -1,8 +1,7 @@
 package main
 
-import "github.com/kongchengpro/xim/server"
-
 // 需要在项目根目录下运行
 func main() {
-	server.StartStaticServer("./static")
+	//http.HandleFunc("/", HelloHandler)
+	//http.ListenAndServe(":8000", nil)
 }
