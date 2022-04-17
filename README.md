@@ -5,12 +5,22 @@
 ## TODO List
 **加粗**代表正在开发
 <style>
+.inner {
+    display:none;
+}
+.outer {
+    height: fit-content;
+}
+.outer:hover .inner{
+    display:block ;
+}
 </style>
 <div class="outer">
-<button onclick="document.getElementById('deprecated-scheme').style.display='block'">
-点击查看已弃用的方案
-</button>
-<div id="deprecated-scheme" style="display: none">
+<p>
+将指针移到此处查看已废弃的方案
+</p>
+<div class="inner">
+
 - [ ] 更高层次的样式封装（2022/1/19）
 - [ ] 数据绑定（2022/1/19）
 - [x] 初步完成回调函数（2022/1/21 ~ 2022/1/21）
