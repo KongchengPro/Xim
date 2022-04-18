@@ -17,7 +17,7 @@ func GenerateRawComponentTree(ctx *types.Context, rc *types.RawComponent) error 
 			childRc := &types.RawComponent{
 				LabelName: "div",
 				Attribute: map[string]string{
-					"style": "background: " + typedChildComp.Color + ";",
+					"style": "background:" + typedChildComp.Color + ";",
 				},
 			}
 			err := GenerateRawComponentTree(childCtx, childRc)

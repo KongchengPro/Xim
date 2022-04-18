@@ -1,10 +1,9 @@
 package xim
 
 import (
-	"encoding/json"
-	"fmt"
 	. "github.com/LouisCheng-CN/xim/components"
 	"github.com/LouisCheng-CN/xim/types"
+	"reflect"
 	"testing"
 )
 
@@ -41,36 +40,35 @@ func TestRender(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	bs, _ := json.MarshalIndent(rawComp, "", "  ")
-	fmt.Println(string(bs))
-	//var target = &RawComponent{
-	//	LabelName: "",
-	//	Attribute: nil,
-	//	Content:   "",
-	//	Children: []*RawComponent{
-	//		&RawComponent{
-	//			LabelName: "",
-	//			Attribute: nil,
-	//			Content:   "",
-	//		},
-	//		&RawComponent{
-	//			LabelName: "",
-	//			Attribute: nil,
-	//			Content:   "",
-	//		},
-	//	},
-	//}
+	//bs, _ := json.MarshalIndent(rawComp, "", "  ")
+	//fmt.Println(string(bs))
+	var target = &types.RawComponent{
+		LabelName: "",
+		Attribute: nil,
+		Content:   "",
+		Children: []*types.RawComponent{
+			{
+				LabelName: "div",
+				Attribute: map[string]string{
+					"style": "background:#fcfaed;",
+				},
+				Children: []*types.RawComponent{
+					{
+						LabelName: "p",
+						Attribute: nil,
+						Content:   "Hello $name!",
+					},
+				},
+			},
+		},
+	}
 	//fmt.Println("generate:")
 	//fmt.Println(rawComp)
 	//fmt.Println("target:")
 	//fmt.Println(target)
-	//if !reflect.DeepEqual(rawComp, target) {
-	//	t.Fail()
-	//}
-}
-
-func Translate(component *types.RawComponent) {
-
+	if !reflect.DeepEqual(rawComp, target) {
+		t.Fail()
+	}
 }
 
 //ComposeString("Hello $Name", "name")
