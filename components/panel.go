@@ -11,6 +11,7 @@ type Panel struct {
 	types.BaseComponent
 }
 
-func (p Panel) Compose(ctx *types.Context) {
+func (p *Panel) Compose(ctx *types.Context) {
+	ctx.Component = p
 	ctx.Apply(p.Children)
 }

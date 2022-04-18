@@ -17,9 +17,7 @@ func (c *Context) AddEventListener(event string, callback func()) {
 // Apply adds all the components in the array to the context
 func (c *Context) Apply(comps []Component) {
 	for _, childComp := range comps {
-		childCtx := &Context{
-			Component: childComp,
-		}
+		childCtx := &Context{}
 		childComp.Compose(childCtx)
 		c.Children = append(c.Children, childCtx)
 	}
@@ -34,17 +32,23 @@ func (c *Context) Insert(childComp Component) {
 	c.Children = append(c.Children, childCtx)
 }
 
-func (c *Context) Search(id string) Component {
-	for _, child := range c.Children {
+// Find 用深度优先算法在Context.Children中搜索指定id的Component并返回它在每一层的索引列表和搜索到的Component对象
+func (c *Context) Find(id string) ([]int, *Context) {
+	var indexList []int
+	var target *Context
+	for i, child := range c.Children {
+		indexList = append(indexList, i)
 		if child.Component.Id() == id {
-			return child.Component
+			target = child
+			break
 		}
 		if child.Children != nil {
-			comp := child.Search(id)
-			if comp != nil {
-				return comp
+			indexList, target = child.Find(id)
+			if target != nil {
+				indexList = append([]int{i}, indexList...)
+				break
 			}
 		}
 	}
-	return nil
+	return indexList, target
 }

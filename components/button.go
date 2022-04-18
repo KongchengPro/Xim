@@ -9,6 +9,7 @@ type Button struct {
 	types.BaseComponent
 }
 
-func (b Button) Compose(ctx *types.Context) {
+func (b *Button) Compose(ctx *types.Context) {
+	ctx.Component = b
 	ctx.AddEventListener("click", b.OnClick)
 }

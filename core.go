@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/LouisCheng-CN/xim/components"
+	"github.com/LouisCheng-CN/xim/internal/utils"
 	"github.com/LouisCheng-CN/xim/types"
 )
 
@@ -14,14 +15,13 @@ func SetTitle(title string) {
 }
 
 func SetContent(content types.Component) {
-	rawComponentTree := &types.RawComponent{}
 	rootCtx := &types.Context{}
 	content.Compose(rootCtx)
 	if IsDebug {
 		bs, _ := json.MarshalIndent(rootCtx, "", "  ")
 		fmt.Printf("context: %+v\n", string(bs))
 	}
-	err := generateRawComponentTree(rootCtx, rawComponentTree)
+	rawComponentTree, err := generateRawComponentTree(rootCtx)
 	if err != nil {
 		fmt.Println("generateRawComponentTree error:", err)
 		return
@@ -30,16 +30,23 @@ func SetContent(content types.Component) {
 		bs, _ := json.MarshalIndent(rawComponentTree, "", "  ")
 		fmt.Println("rawComponentTree:", string(bs))
 	}
-	renderRawComponentTree(rawComponentTree, JsNilValue(), true)
+	renderRawComponentTree(rawComponentTree, JsNilValue(), true, false, JsNilValue())
 	go func() {
 		for {
 			select {
 			case subscriber := <-types.RefreshChannel:
-				comp := rootCtx.Search(subscriber)
+				indexList, ctx := rootCtx.Find(subscriber)
+				comp := ctx.Component
 				newCtx := &types.Context{}
+				if IsDebug {
+					utils.PrintlnStruct("comp [new]:", comp)
+				}
 				comp.Compose(newCtx)
-				newRawComponentTree := &types.RawComponent{}
-				err := generateRawComponentTree(newCtx, newRawComponentTree)
+				if IsDebug {
+					bs, _ := json.MarshalIndent(newCtx, "", "  ")
+					fmt.Println("newCtx:", string(bs))
+				}
+				newRawComponentTree, err := generateRawComponentTree(newCtx)
 				if err != nil {
 					fmt.Println("generateRawComponentTree error [new]:", err)
 					return
@@ -48,63 +55,88 @@ func SetContent(content types.Component) {
 					bs, _ := json.MarshalIndent(newRawComponentTree, "", "  ")
 					fmt.Println("newRawComponentTree [new]:", string(bs))
 				}
-				//renderRawComponentTree(rawComponentTree, JsNilValue(), true)
-			default:
+				contentRootDiv := body.Get("children").Index(3)
+				target := contentRootDiv
+				targetParent := contentRootDiv
+				for i, index := range indexList {
+					target = target.Get("children").Index(index)
+					if i != len(indexList)-1 {
+						targetParent = targetParent.Get("children").Index(index)
+					}
+				}
+				//targetParent.Call("removeChild", target)
+				renderRawComponentTree(newRawComponentTree, targetParent, false, true, target)
 			}
 		}
 	}()
 }
 
-func generateRawComponentTree(ctx *types.Context, rc *types.RawComponent) error {
-	if len(ctx.Children) != 0 && rc.Children == nil {
-		rc.Children = make([]*types.RawComponent, 0)
+func generateRawComponentTree(ctx *types.Context) (*types.RawComponent, error) {
+	if ctx.Children == nil {
+		ctx.Children = make([]*types.Context, 0)
 	}
-	for _, childCtx := range ctx.Children {
-		var childRc *types.RawComponent
-		childComp := childCtx.Component
-		switch typedChildComp := childComp.(type) {
-		case *components.Panel:
-			childRc = &types.RawComponent{
-				LabelName: "div",
-				Attributes: map[string]string{
-					"style": "background:" + typedChildComp.Color + ";",
-				},
-			}
-			err := generateRawComponentTree(childCtx, childRc)
+	comp := ctx.Component
+	rc := &types.RawComponent{
+		Children: make([]*types.RawComponent, 0),
+	}
+	if comp == nil {
+		for _, childCtx := range ctx.Children {
+			childRc, err := generateRawComponentTree(childCtx)
 			if err != nil {
-				return err
+				return nil, err
 			}
-
-		case *components.Text:
-			childRc = &types.RawComponent{
-				LabelName:  "p",
-				Attributes: nil,
-				Content:    typedChildComp.Content,
-			}
-		case *components.Button:
-			childRc = &types.RawComponent{
-				LabelName:  "button",
-				Attributes: nil,
-				Content:    typedChildComp.Content,
-			}
-		default:
-			err := generateRawComponentTree(childCtx, rc)
-			if err != nil {
-				return err
-			}
+			rc.Children = append(rc.Children, childRc)
 		}
-		childRc.Id = childComp.Id()
-		childRc.EventListeners = childCtx.EventListeners
-		rc.Children = append(rc.Children, childRc)
+		return rc, nil
 	}
-	return nil
+	switch typedChildComp := comp.(type) {
+	case *components.Panel:
+		rc = &types.RawComponent{
+			LabelName: "div",
+			Attributes: map[string]string{
+				"style": "background:" + typedChildComp.Color + ";",
+			},
+		}
+		for _, childCtx := range ctx.Children {
+			childRc, err := generateRawComponentTree(childCtx)
+			if err != nil {
+				return nil, err
+			}
+			rc.Children = append(rc.Children, childRc)
+		}
+	case *components.Text:
+		rc = &types.RawComponent{
+			LabelName:  "p",
+			Attributes: nil,
+			Content:    typedChildComp.Content,
+		}
+	case *components.Button:
+		rc = &types.RawComponent{
+			LabelName:  "button",
+			Attributes: nil,
+			Content:    typedChildComp.Content,
+		}
+	default:
+		for _, childCtx := range ctx.Children {
+			childRc, err := generateRawComponentTree(childCtx)
+			if err != nil {
+				return nil, err
+			}
+			rc.Children = append(rc.Children, childRc)
+		}
+	}
+	rc.Id = comp.Id()
+	rc.EventListeners = ctx.EventListeners
+	return rc, nil
 }
 
-func renderRawComponentTree(rc *types.RawComponent, parentElem JsValue, isRoot bool) {
+func renderRawComponentTree(rc *types.RawComponent, parentElem JsValue, isRoot bool, isReplace bool, oldElem JsValue) {
 	if isRoot {
 		parentElem = doc.Get("body")
+		elem := doc.Call("createElement", "div")
+		parentElem.Call("appendChild", elem)
 		for _, childRc := range rc.Children {
-			renderRawComponentTree(childRc, parentElem, false)
+			renderRawComponentTree(childRc, elem, false, false, JsNilValue())
 		}
 		return
 	}
@@ -123,11 +155,15 @@ func renderRawComponentTree(rc *types.RawComponent, parentElem JsValue, isRoot b
 		}
 	}
 	// 在父元素中添加
-	parentElem.Call("appendChild", elem)
+	if isReplace {
+		parentElem.Call("replaceChild", elem, oldElem)
+	} else {
+		parentElem.Call("appendChild", elem)
+	}
 	// 递归渲染子组件
 	if len(rc.Children) != 0 {
 		for _, child := range rc.Children {
-			renderRawComponentTree(child, elem, false)
+			renderRawComponentTree(child, elem, false, false, JsNilValue())
 		}
 	}
 }

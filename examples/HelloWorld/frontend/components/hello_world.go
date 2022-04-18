@@ -36,11 +36,9 @@ var HelloWorld = helloWorld{
 			Color: "#fcfaed",
 			Children: []Component{
 				New[Text](func(t *Text) {
-					if t == nil {
-						panic("nil ")
+					t.DynamicContent = func() string {
+						return "Hello " + storage.States.name.Value(t.Id()) + "!"
 					}
-
-					t.Content = "Hello " + storage.States.name.Value(t.Id()) + "!"
 				}),
 				&Button{
 					Content: "Click me!",

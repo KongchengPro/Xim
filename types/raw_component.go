@@ -1,7 +1,7 @@
 package types
 
 type RawComponent struct {
-	Id             string
+	Id             string `json:"-"`
 	LabelName      string
 	Attributes     map[string]string
 	EventListeners map[string]func() `json:"-"`

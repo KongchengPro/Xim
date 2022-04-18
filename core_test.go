@@ -37,14 +37,9 @@ func TestGenerateRawComponentTree(t *testing.T) {
 			},
 		},
 	}
-	var rawComp = &types.RawComponent{
-		LabelName:  "",
-		Attributes: nil,
-		Content:    "",
-	}
 	ctx := &types.Context{}
 	HelloWorldComp.Compose(ctx)
-	err := generateRawComponentTree(ctx, rawComp)
+	rawComp, err := generateRawComponentTree(ctx)
 	if err != nil {
 		panic(err)
 	}

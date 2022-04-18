@@ -6,10 +6,14 @@ import (
 
 // Text 文本
 type Text struct {
-	Content string
+	Content        string
+	DynamicContent func() string
 	types.BaseComponent
 }
 
-func (t Text) Compose(_ *types.Context) {
-
+func (t *Text) Compose(ctx *types.Context) {
+	if t.DynamicContent != nil {
+		t.Content = t.DynamicContent()
+	}
+	ctx.Component = t
 }
