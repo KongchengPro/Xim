@@ -1,29 +1,53 @@
-//go:build js || wasm
-
-package main
+package components
 
 import (
-	. "github.com/LouisCheng-CN/xim"
+	"fmt"
 	. "github.com/LouisCheng-CN/xim/components"
 	. "github.com/LouisCheng-CN/xim/types"
 )
 
-type HelloWorld struct {
+type helloWorld struct {
 	children []Component
 	BaseComponent
 }
 
-func (h HelloWorld) Compose(ctx *Context) {
+func (h helloWorld) Compose(ctx *Context) {
 	ctx.Apply(h.children)
 }
 
-var HelloWorldComp = HelloWorld{
+type states struct {
+	name MutableState[string]
+}
+
+var storage = &Storage[states]{
+	States: &states{
+		name: MutableStateOf("World"),
+	},
+	Mutations: map[string]func(*states, ...Value){
+		"setName": func(s *states, args ...Value) {
+			s.name.SetValue(args[0].(string))
+		},
+	},
+}
+
+var HelloWorld = helloWorld{
 	children: []Component{
-		Panel{
+		&Panel{
 			Color: "#fcfaed",
 			Children: []Component{
-				Text{
-					Content: "Hello $name!",
+				New[Text](func(t *Text) {
+					if t == nil {
+						panic("nil ")
+					}
+
+					t.Content = "Hello " + storage.States.name.Value(t.Id()) + "!"
+				}),
+				&Button{
+					Content: "Click me!",
+					OnClick: func() {
+						fmt.Println("Clicked!")
+						storage.Commit("setName", "Xim")
+					},
 				},
 			},
 		},

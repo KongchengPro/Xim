@@ -7,7 +7,6 @@ import (
 // Text 文本
 type Text struct {
 	Content string
-	events  chan *types.Event
 	types.BaseComponent
 }
 

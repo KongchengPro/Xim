@@ -2,13 +2,13 @@
 <module type="WEB_MODULE" version="4">
   <component name="Go" enabled="true">
     <buildTags>
-      <option name="os" value="js" />
-      <option name="arch" value="wasm" />
       <option name="cgo" value="NO" />
     </buildTags>
   </component>
   <component name="NewModuleRootManager">
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/static" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>

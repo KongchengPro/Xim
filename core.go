@@ -1,105 +1,138 @@
 package xim
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/LouisCheng-CN/xim/components"
 	"github.com/LouisCheng-CN/xim/types"
 )
 
-func GenerateRawComponentTree(ctx *types.Context, rc *types.RawComponent) error {
-	if rc.Children == nil {
+var IsDebug bool
+
+func SetTitle(title string) {
+	doc.Set("title", title)
+}
+
+func SetContent(content types.Component) {
+	rawComponentTree := &types.RawComponent{}
+	rootCtx := &types.Context{}
+	content.Compose(rootCtx)
+	if IsDebug {
+		bs, _ := json.MarshalIndent(rootCtx, "", "  ")
+		fmt.Printf("context: %+v\n", string(bs))
+	}
+	err := generateRawComponentTree(rootCtx, rawComponentTree)
+	if err != nil {
+		fmt.Println("generateRawComponentTree error:", err)
+		return
+	}
+	if IsDebug {
+		bs, _ := json.MarshalIndent(rawComponentTree, "", "  ")
+		fmt.Println("rawComponentTree:", string(bs))
+	}
+	renderRawComponentTree(rawComponentTree, JsNilValue(), true)
+	go func() {
+		for {
+			select {
+			case subscriber := <-types.RefreshChannel:
+				comp := rootCtx.Search(subscriber)
+				newCtx := &types.Context{}
+				comp.Compose(newCtx)
+				newRawComponentTree := &types.RawComponent{}
+				err := generateRawComponentTree(newCtx, newRawComponentTree)
+				if err != nil {
+					fmt.Println("generateRawComponentTree error [new]:", err)
+					return
+				}
+				if IsDebug {
+					bs, _ := json.MarshalIndent(newRawComponentTree, "", "  ")
+					fmt.Println("newRawComponentTree [new]:", string(bs))
+				}
+				//renderRawComponentTree(rawComponentTree, JsNilValue(), true)
+			default:
+			}
+		}
+	}()
+}
+
+func generateRawComponentTree(ctx *types.Context, rc *types.RawComponent) error {
+	if len(ctx.Children) != 0 && rc.Children == nil {
 		rc.Children = make([]*types.RawComponent, 0)
 	}
 	for _, childCtx := range ctx.Children {
+		var childRc *types.RawComponent
 		childComp := childCtx.Component
 		switch typedChildComp := childComp.(type) {
-		case components.Panel:
-			childRc := &types.RawComponent{
+		case *components.Panel:
+			childRc = &types.RawComponent{
 				LabelName: "div",
-				Attribute: map[string]string{
+				Attributes: map[string]string{
 					"style": "background:" + typedChildComp.Color + ";",
 				},
 			}
-			err := GenerateRawComponentTree(childCtx, childRc)
+			err := generateRawComponentTree(childCtx, childRc)
 			if err != nil {
 				return err
 			}
-			rc.Children = append(rc.Children, childRc)
-		case components.Text:
-			rc.Children = append(rc.Children, &types.RawComponent{
-				LabelName: "p",
-				Attribute: nil,
-				Content:   typedChildComp.Content,
-			})
+
+		case *components.Text:
+			childRc = &types.RawComponent{
+				LabelName:  "p",
+				Attributes: nil,
+				Content:    typedChildComp.Content,
+			}
+		case *components.Button:
+			childRc = &types.RawComponent{
+				LabelName:  "button",
+				Attributes: nil,
+				Content:    typedChildComp.Content,
+			}
 		default:
-			err := GenerateRawComponentTree(childCtx, rc)
+			err := generateRawComponentTree(childCtx, rc)
 			if err != nil {
 				return err
 			}
 		}
+		childRc.Id = childComp.Id()
+		childRc.EventListeners = childCtx.EventListeners
+		rc.Children = append(rc.Children, childRc)
 	}
 	return nil
 }
 
-func SetContent(content types.Component) {
-	rawComponentTree := types.RawComponent{
-		LabelName: "div",
-		Attribute: nil,
-		Content:   "",
+func renderRawComponentTree(rc *types.RawComponent, parentElem JsValue, isRoot bool) {
+	if isRoot {
+		parentElem = doc.Get("body")
+		for _, childRc := range rc.Children {
+			renderRawComponentTree(childRc, parentElem, false)
+		}
+		return
 	}
-	rootCtx := &types.Context{}
-	content.Compose(rootCtx)
-	err := GenerateRawComponentTree(rootCtx, &rawComponentTree)
-	if err != nil {
-		fmt.Println(err)
+	if IsDebug {
+		//fmt.Printf("renderRawComponentTree_createElement: %+v\n", rc)
+	}
+	elem := doc.Call("createElement", rc.LabelName)
+	//elem.Set("id", comp.Id())
+	elem.Set("innerHTML", rc.Content)
+	if rc.EventListeners != nil {
+		for event, handler := range rc.EventListeners {
+			elem.Call("addEventListener", event, JsFuncOf(func(this JsValue, args []JsValue) interface{} {
+				handler()
+				return nil
+			}))
+		}
+	}
+	// 在父元素中添加
+	parentElem.Call("appendChild", elem)
+	// 递归渲染子组件
+	if len(rc.Children) != 0 {
+		for _, child := range rc.Children {
+			renderRawComponentTree(child, elem, false)
+		}
 	}
 }
 
-//
-//func AddChild(child Composable, parent Composable) {
-//	comp := child.Compose()
-//	// 找到父元素
-//	var parentElement js.Value
-//	if _, ok := parent.(*components.Root); ok {
-//		parentElement = doc.Get("body")
-//	} else {
-//		parentElement = doc.Call("getElementById", parent.Compose().Id())
-//	}
-//	if parentElement.Equal(js.ValueOf(nil)) {
-//		fmt.Println("找不到父组件：%T%+v", parent, parent)
-//		return
-//	}
-//	// 创建元素
-//	var elemType string
-//	if comp.IsInline {
-//		elemType = "div"
-//	} else {
-//		elemType = "span"
-//	}
-//	elem := doc.Call("createElement", elemType)
-//	elem.Set("id", comp.Id())
-//	callbackMap := comp.CallbackMap
-//	if callbackMap != nil {
-//		for callbackName, callbackFunc := range callbackMap {
-//			elem.Call("addEventListener", callbackName, js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-//				callbackFunc(this, args...)
-//				return nil
-//			}))
-//		}
-//	}
-//	// 在父元素中添加
-//	parentElement.Call("appendChild", elem)
-//	// 刷新一次组件以显示内容
-//	Refresh(comp)
-//	// 递归渲染子组件
-//	if len(comp.Children) != 0 {
-//		for _, child := range comp.Children {
-//			AddChild(child, comp)
-//		}
-//	}
-//}
-//
-//// Refresh 刷新组件的内容和属性
+//Refresh 刷新组件的内容和属性
 //func Refresh(comp *Composition) {
 //	element := doc.Call("getElementById", comp.Id())
 //	html := comp.Html

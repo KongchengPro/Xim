@@ -1,9 +1,10 @@
 package xim
 
 import (
+	"encoding/json"
+	"fmt"
 	. "github.com/LouisCheng-CN/xim/components"
 	"github.com/LouisCheng-CN/xim/types"
-	"reflect"
 	"testing"
 )
 
@@ -16,57 +17,78 @@ func (h HelloWorld) Compose(ctx *types.Context) {
 	ctx.Apply(h.children)
 }
 
-func TestRender(t *testing.T) {
+func TestGenerateRawComponentTree(t *testing.T) {
+	var flag = false
 	var HelloWorldComp = HelloWorld{
 		children: []types.Component{
-			Panel{
+			&Panel{
 				Color: "#fcfaed",
 				Children: []types.Component{
-					Text{
+					&Text{
 						Content: "Hello $name!",
+					},
+					&Button{
+						Content: "Click me!",
+						OnClick: func() {
+							flag = true
+						},
 					},
 				},
 			},
 		},
 	}
 	var rawComp = &types.RawComponent{
-		LabelName: "",
-		Attribute: nil,
-		Content:   "",
+		LabelName:  "",
+		Attributes: nil,
+		Content:    "",
 	}
 	ctx := &types.Context{}
 	HelloWorldComp.Compose(ctx)
-	err := GenerateRawComponentTree(ctx, rawComp)
+	err := generateRawComponentTree(ctx, rawComp)
 	if err != nil {
 		panic(err)
 	}
-	//bs, _ := json.MarshalIndent(rawComp, "", "  ")
-	//fmt.Println(string(bs))
+	rawCompJsonBs, err := json.MarshalIndent(rawComp, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(rawCompJsonBs))
 	var target = &types.RawComponent{
-		LabelName: "",
-		Attribute: nil,
-		Content:   "",
+		LabelName:  "",
+		Attributes: nil,
+		Content:    "",
 		Children: []*types.RawComponent{
 			{
 				LabelName: "div",
-				Attribute: map[string]string{
+				Attributes: map[string]string{
 					"style": "background:#fcfaed;",
 				},
 				Children: []*types.RawComponent{
 					{
-						LabelName: "p",
-						Attribute: nil,
-						Content:   "Hello $name!",
+						LabelName:  "p",
+						Attributes: nil,
+						Content:    "Hello $name!",
+					},
+					{
+						LabelName:  "button",
+						Attributes: nil,
+						Content:    "Click me!",
 					},
 				},
 			},
 		},
 	}
-	//fmt.Println("generate:")
-	//fmt.Println(rawComp)
-	//fmt.Println("target:")
-	//fmt.Println(target)
-	if !reflect.DeepEqual(rawComp, target) {
+	if err != nil {
+		panic(err)
+	}
+	targetJsonBs, err := json.MarshalIndent(target, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(targetJsonBs))
+	rawCompBtnHandler := rawComp.Children[0].Children[1].EventListeners["click"]
+	rawCompBtnHandler()
+	if flag && string(rawCompJsonBs) != string(targetJsonBs) {
 		t.Fail()
 	}
 }
