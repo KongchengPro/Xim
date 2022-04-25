@@ -55,7 +55,7 @@ func SetContent(content types.Component) {
 					bs, _ := json.MarshalIndent(newRawComponentTree, "", "  ")
 					fmt.Println("newRawComponentTree [new]:", string(bs))
 				}
-				contentRootDiv := body.Get("children").Index(3)
+				contentRootDiv := body.Get("lastElementChild")
 				target := contentRootDiv
 				targetParent := contentRootDiv
 				for i, index := range indexList {
