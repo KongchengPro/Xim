@@ -13,19 +13,24 @@ func SetTitle(title string) {
 	doc.Set("title", title)
 }
 
-func getViewRoot() JsValue {
-	return body.Get("lastElementChild")
-}
+var viewRoot JsValue
 
-var isFirst bool
+func getViewRoot() JsValue {
+	if viewRoot.IsUndefined() {
+		parentElem := doc.Get("body")
+		elem := doc.Call("createElement", "div")
+		parentElem.Call("appendChild", elem)
+		viewRoot = elem
+	}
+	return viewRoot
+}
 
 // SetContent 设置内容
 // 会清除已有的内容
 func SetContent(content types.Component) {
-	if isFirst {
-		isFirst = true
-	} else {
-		getViewRoot().Call("remove")
+	childrenCount := getViewRoot().Get("children").Get("length").Int()
+	for i := 0; i < childrenCount; i++ {
+		getViewRoot().Get("children").Index(0).Call("remove")
 	}
 	rootCtx := &types.Context{}
 	content.Compose(rootCtx)
@@ -122,42 +127,6 @@ func generateRawComponentTree(ctx *types.Context) (*types.RawComponent, error) {
 			rc.Children = append(rc.Children, childRc)
 		}
 	}
-	//switch typedChildComp := comp.(type) {
-	//case *components.Panel:
-	//	rc = &types.RawComponent{
-	//		LabelName: "div",
-	//		Attributes: map[string]string{
-	//			"style": "background:" + typedChildComp.Color + ";",
-	//		},
-	//	}
-	//	for _, childCtx := range ctx.Children {
-	//		childRc, err := generateRawComponentTree(childCtx)
-	//		if err != nil {
-	//			return nil, err
-	//		}
-	//		rc.Children = append(rc.Children, childRc)
-	//	}
-	//case *components.Text:
-	//	rc = &types.RawComponent{
-	//		LabelName:  "p",
-	//		Attributes: nil,
-	//		Content:    typedChildComp.Content.Calculate(),
-	//	}
-	//case *components.Button:
-	//	rc = &types.RawComponent{
-	//		LabelName:  "button",
-	//		Attributes: nil,
-	//		Content:    typedChildComp.Content,
-	//	}
-	//default:
-	//	for _, childCtx := range ctx.Children {
-	//		childRc, err := generateRawComponentTree(childCtx)
-	//		if err != nil {
-	//			return nil, err
-	//		}
-	//		rc.Children = append(rc.Children, childRc)
-	//	}
-	//}
 	rc.Id = comp.Id()
 	rc.EventListeners = ctx.EventListeners
 	return rc, nil
@@ -189,12 +158,7 @@ func renderRawComponentTree(rc *types.RawComponent, parentElem JsValue) {
 }
 
 func initRenderRawComponentTree(rc *types.RawComponent) {
-	parentElem := doc.Get("body")
-	elem := doc.Call("createElement", "div")
-	parentElem.Call("appendChild", elem)
-	for _, childRc := range rc.Children {
-		renderRawComponentTree(childRc, elem)
-	}
+	renderRawComponentTree(rc, getViewRoot())
 }
 
 func createElementFromRawComponent(rc *types.RawComponent) JsValue {

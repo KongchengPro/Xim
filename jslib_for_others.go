@@ -25,13 +25,25 @@ func (v JsValue) Call(args ...interface{}) JsValue {
 	return JsValue{}
 }
 
+//goland:noinspection GoUnusedParameter
+func (v JsValue) IsUndefined() bool {
+	return false
+}
+
+//goland:noinspection GoUnusedParameter
 func (v JsValue) String() string {
 	return ""
+}
+
+//goland:noinspection GoUnusedParameter
+func (v JsValue) Int() int {
+	return 0
 }
 
 type JsFunc struct {
 }
 
+//goland:noinspection GoUnusedParameter,GoUnusedExportedFunction
 func JsNilValue() JsValue {
 	return JsValue{}
 }

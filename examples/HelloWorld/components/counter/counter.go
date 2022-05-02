@@ -25,6 +25,7 @@ var storage = &types.Storage[states]{
 }
 
 var Counter = Panel{
+	Color: "#fcfaed",
 	Children: []types.Component{
 		Text{
 			Initializer: func(text *Text) {
