@@ -17,10 +17,16 @@ func getViewRoot() JsValue {
 	return body.Get("lastElementChild")
 }
 
+var isFirst bool
+
 // SetContent 设置内容
 // 会清除已有的内容
 func SetContent(content types.Component) {
-	getViewRoot().Call("remove")
+	if isFirst {
+		isFirst = true
+	} else {
+		getViewRoot().Call("remove")
+	}
 	rootCtx := &types.Context{}
 	content.Compose(rootCtx)
 	if IsDebug {
