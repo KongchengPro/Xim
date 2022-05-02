@@ -1,4 +1,4 @@
-module github.com/LouisCheng-CN/xim
+module github.com/Re-Ch-Love/xim
 
 go 1.18
 

@@ -3,8 +3,8 @@ package xim
 import (
 	"encoding/json"
 	"fmt"
-	. "github.com/LouisCheng-CN/xim/components"
-	"github.com/LouisCheng-CN/xim/types"
+	. "github.com/Re-Ch-Love/xim/components"
+	"github.com/Re-Ch-Love/xim/types"
 	"testing"
 )
 
@@ -14,7 +14,7 @@ type HelloWorld struct {
 }
 
 func (h HelloWorld) Compose(ctx *types.Context) {
-	ctx.Apply(h.children)
+	ctx.AddChildren(h.children)
 }
 
 func TestGenerateRawComponentTree(t *testing.T) {
@@ -25,7 +25,7 @@ func TestGenerateRawComponentTree(t *testing.T) {
 				Color: "#fcfaed",
 				Children: []types.Component{
 					&Text{
-						Content: "Hello $name!",
+						Content: types.NewStaticData[string]("Hello World"),
 					},
 					&Button{
 						Content: "Click me!",
@@ -94,7 +94,7 @@ func TestGenerateRawComponentTree(t *testing.T) {
 //	~string | ~func(f string, args ...string) string
 //}
 //
-//var globalVar = make(map[string]types.Value)
+//var globalVar = make(map[string]types.Data)
 //
 //func ComposeString(f string, args ...string) func() string {
 //	return func() string {

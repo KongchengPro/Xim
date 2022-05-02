@@ -11,8 +11,8 @@ func TestStorage_Commit(t *testing.T) {
 	}
 	s := Storage[Data]{
 		States: &data,
-		Mutations: map[string]func(*Data, ...Value){
-			"add": func(data *Data, args ...Value) {
+		Mutations: map[string]func(*Data, ...any){
+			"add": func(data *Data, args ...any) {
 				data.n += args[0].(int)
 			},
 		},

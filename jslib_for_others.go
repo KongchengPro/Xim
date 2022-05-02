@@ -25,6 +25,10 @@ func (v JsValue) Call(args ...interface{}) JsValue {
 	return JsValue{}
 }
 
+func (v JsValue) String() string {
+	return ""
+}
+
 type JsFunc struct {
 }
 
@@ -39,6 +43,8 @@ func JsFuncOf(fn func(this JsValue, args []JsValue) any) JsFunc {
 
 //goland:noinspection GoUnusedGlobalVariable
 var (
-	doc  = JsValue{}
-	body = JsValue{}
+	global = JsValue{}
+	doc    = JsValue{}
+	body   = JsValue{}
+	window = JsValue{}
 )

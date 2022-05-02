@@ -14,8 +14,8 @@ func (c *Context) AddEventListener(event string, callback func()) {
 	c.EventListeners[event] = callback
 }
 
-// Apply adds all the components in the array to the context
-func (c *Context) Apply(comps []Component) {
+// AddChildren adds all the components in the array to the context
+func (c *Context) AddChildren(comps []Component) {
 	for _, childComp := range comps {
 		childCtx := &Context{}
 		childComp.Compose(childCtx)
@@ -23,8 +23,8 @@ func (c *Context) Apply(comps []Component) {
 	}
 }
 
-// Insert adds n child Component to the context
-func (c *Context) Insert(childComp Component) {
+// AddChild adds n child Component to the context
+func (c *Context) AddChild(childComp Component) {
 	childCtx := &Context{
 		Component: childComp,
 	}

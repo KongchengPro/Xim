@@ -16,6 +16,10 @@ func checkInSubscribers(s []string, id string) bool {
 	return false
 }
 
+func (m *MutableState[T]) Get() T {
+	return m.value
+}
+
 func (m *MutableState[T]) Value(id string) T {
 	if !checkInSubscribers(m.subscribers, id) {
 		m.subscribers = append(m.subscribers, id)

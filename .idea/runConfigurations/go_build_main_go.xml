@@ -9,7 +9,7 @@
     </envs>
     <kind value="FILE" />
     <directory value="$PROJECT_DIR$" />
-    <filePath value="$PROJECT_DIR$/examples/HelloWorld/frontend/main.go" />
+    <filePath value="$PROJECT_DIR$/examples/HelloWorld/main.go" />
     <option name="run" value="false" />
     <method v="2" />
   </configuration>
