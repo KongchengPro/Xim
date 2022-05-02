@@ -1,10 +1,11 @@
 package types
 
-import "github.com/LouisCheng-CN/xim/internal/utils"
+import "github.com/Re-Ch-Love/xim/internal/utils"
 
 type Component interface {
 	Id() string
 	Compose(*Context)
+	Create() Component
 }
 
 type BaseComponent struct {

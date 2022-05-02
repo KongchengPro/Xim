@@ -18,6 +18,8 @@ func JsNilValue() JsValue {
 
 //goland:noinspection GoUnusedGlobalVariable
 var (
-	doc  = js.Global().Get("document")
-	body = doc.Get("body")
+	global = js.Global()
+	doc    = global.Get("document")
+	body   = doc.Get("body")
+	window = global.Get("window")
 )
